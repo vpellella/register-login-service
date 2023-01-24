@@ -23,4 +23,6 @@ There will be a default user admin/admin which can help to access.
 
 > [app/db]           - help to open h2 database [try in browser only]
 
-> [/app/hello]       - help to test secured endpoint
+> [/hello]           - help to test secured endpoint only Users having USER role can access
+
+> [/uploadfile]      - Any authorized user can upload files
