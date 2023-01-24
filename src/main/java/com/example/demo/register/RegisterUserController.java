@@ -2,13 +2,17 @@ package com.example.demo.register;
 
 
 import com.example.demo.common.enums.RoleEnum;
-import com.example.demo.dto.NewUserRegistrationRequest;
+import com.example.demo.common.service.JwtService;
+import com.example.demo.dto.UserRegistrationRequest;
+import com.example.demo.dto.UserRegistrationResponse;
 import com.example.demo.entity.AppUser;
 import com.example.demo.entity.Role;
 import com.example.demo.repository.AppUserRepository;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,20 +21,21 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.example.demo.common.utils.CommonUtils.getAuthoritiesFromRoles;
+
 @RestController
 @Slf4j
+@AllArgsConstructor
 public class RegisterUserController {
 
     private final AppUserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    public RegisterUserController(AppUserRepository userRepository, PasswordEncoder passwordEncoder)
-    {
-        this.userRepository = userRepository;
-        this.passwordEncoder = passwordEncoder;
-    }
+    private final JwtService jwtService;
 
-    @PostMapping(value = "/users/register", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public String registerUser( @Valid @RequestBody NewUserRegistrationRequest request) {
+
+    @PostMapping(value = "/register",
+            consumes = MediaType.APPLICATION_JSON_VALUE)
+    public UserRegistrationResponse registerUser(@Valid @RequestBody UserRegistrationRequest request) {
         System.out.println(request);
         log.info("Inside of register user");
         AppUser user = new AppUser();
@@ -39,11 +44,17 @@ public class RegisterUserController {
         user.setRoles(getRoles(request));
         userRepository.save(user);
 
-        return "User "+ user.getUsername() +" registered successfully";
+        var userDetails = new User(user.getUsername(), "dummy", getAuthoritiesFromRoles(user.getRoles()));
+
+//        return "User "+ user.getUsername() +" registered successfully";
+        return UserRegistrationResponse.builder()
+                .message("User "+ user.getUsername() +" registered successfully")
+                .token(jwtService.generateJwtToken(userDetails))
+                .build();
 
     }
 
-    private List<Role> getRoles(NewUserRegistrationRequest request) {
+    private List<Role> getRoles(UserRegistrationRequest request) {
         List<Role> rolesList = request.getRoles()
                               .stream()
                               .map(role -> "ROLE_"+role.toUpperCase())

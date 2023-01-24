@@ -20,11 +20,12 @@ public class SecurityFilter {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         httpSecurity
+                .cors().and()
                 .csrf().ignoringRequestMatchers("/h2-console/**").disable()
                 .headers().frameOptions().sameOrigin()
                 .and()
                 .authorizeHttpRequests()
-                .requestMatchers( "/login/**", "/users/register/**").permitAll()
+                .requestMatchers( "/login/**","/register/**", "/users/register/**").permitAll()
 //                .requestMatchers( "/actuator/**").permitAll()
 //                .requestMatchers( "/h2-console/**").permitAll()
                 .anyRequest()

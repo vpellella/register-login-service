@@ -16,7 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class NewUserRegistrationRequest {
+public class UserRegistrationRequest {
 
     @NotNull
     @Size(min = 6, max = 25)
@@ -27,7 +27,7 @@ public class NewUserRegistrationRequest {
     private String password;
 
     private List<String> roles = new ArrayList<>();
-    @NotEmpty
+
     private List<String> authorities;
 
 }

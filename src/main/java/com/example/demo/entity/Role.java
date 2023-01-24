@@ -25,6 +25,6 @@ public class Role {
     @Enumerated(EnumType.STRING)
     private RoleEnum name;
 
-    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "roles")
+    @ManyToMany(cascade = CascadeType.ALL, mappedBy = "roles", fetch = FetchType.EAGER)
     private List<AppUser> users = new ArrayList<>();
 }
